@@ -46,66 +46,65 @@ def draw_dfa(dfa):
     return data
 
 
-if __name__ == "__main__":
-    app = Flask(__name__)
-    cors = CORS(app)
+app = Flask(__name__)
+cors = CORS(app)
 
-    @app.route('/', )
-    @cross_origin()
-    def index():
-        return jsonify({'name': 'alice',
-                        'email': 'alice@outlook.com'})
+@app.route('/', )
+@cross_origin()
+def index():
+    return jsonify({'name': 'alice',
+                    'email': 'alice@outlook.com'})
 
-    @app.route('/regex-to-nfa', methods=['POST'])
-    @cross_origin()
-    def regex2nfa():
-        try:
-            data = request.json
-            regex = data.get('regex')
-            nfa = regex_to_nfa(regex)
-            return jsonify(nfa)
-        except:
-            print("An exception occurred")
-            return jsonify({
-                'err': 'true',
-            })
+@app.route('/regex-to-nfa', methods=['POST'])
+@cross_origin()
+def regex2nfa():
+    try:
+        data = request.json
+        regex = data.get('regex')
+        nfa = regex_to_nfa(regex)
+        return jsonify(nfa)
+    except:
+        print("An exception occurred")
+        return jsonify({
+            'err': 'true',
+        })
 
-    @app.route('/nfa-to-dfa', methods=['POST'])
-    @cross_origin()
-    def nfa2dfa():
-        try:
-            data = request.json
-            nfa = data.get('nfa')
-            dfa = nfa_to_dfa(nfa)
+@app.route('/nfa-to-dfa', methods=['POST'])
+@cross_origin()
+def nfa2dfa():
+    try:
+        data = request.json
+        nfa = data.get('nfa')
+        dfa = nfa_to_dfa(nfa)
 
-            dataShowDfa = draw_dfa(dfa)
-            data = {
-                'dfa': str(dfa),
-                'dataShowDfa': dataShowDfa
-            }
-            return jsonify(data)
-        except:
-            print("An exception occurred")
-            return jsonify({
-                'err': 'true',
-            })
+        dataShowDfa = draw_dfa(dfa)
+        data = {
+            'dfa': str(dfa),
+            'dataShowDfa': dataShowDfa
+        }
+        return jsonify(data)
+    except:
+        print("An exception occurred")
+        return jsonify({
+            'err': 'true',
+        })
 
-    @app.route('/dfa-to-regex', methods=['POST'])
-    @cross_origin()
-    def dfa2regex():
-        try:
-            data = request.json
-            dfa = data.get('dfa')
-            newDfa = dfa_to_efficient_dfa(dfa)
-            regex = dfa_to_regex(newDfa)
-            data = {
-                'regex': str(regex)
-            }
-            return jsonify(data)
-        except:
-            print("An exception occurred")
-            return jsonify({
-                'err': 'true',
-            })
-        
-    app.run(debug=True)
+@app.route('/dfa-to-regex', methods=['POST'])
+@cross_origin()
+def dfa2regex():
+    try:
+        data = request.json
+        dfa = data.get('dfa')
+        newDfa = dfa_to_efficient_dfa(dfa)
+        regex = dfa_to_regex(newDfa)
+        data = {
+            'regex': str(regex)
+        }
+        return jsonify(data)
+    except:
+        print("An exception occurred")
+        return jsonify({
+            'err': 'true',
+        })
+    
+app.run(debug=True)
