@@ -1,5 +1,5 @@
 
-import datetime
+import time
 from flask import Blueprint, jsonify, request
 from dbs.configMongoDB import get_database
 from bson.json_util import dumps
@@ -20,19 +20,18 @@ def createFolder():
         "name": name,
         "user": ObjectId(userId),
         "parent": ObjectId(parentId),
-        "dateCreate": datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'),
+        "dateCreate": round(time.time() * 1000),
         "size": '',
         "type": 'folder',
         "path": path
     })
-    return "Tạo thư mục thành công", 200
+    return "Create folder successfully!", 200
 
 @driveRoutes.route('/drive/get-all-folder', methods = ['POST'])
 def getAllFolder():
     mydb = get_database()
     data = request.json
     userId = data.get("userId")
-    print(userId, "======")
     folderCol = mydb["folders"]
     folders = folderCol.aggregate([
         {
@@ -59,3 +58,36 @@ def getAllFolder():
             folder['parent']['parent'] = str(folder['parent']['parent'])
         resData.append(folder)
     return jsonify(resData)
+
+@driveRoutes.route('/drive/save-file', methods = ['POST'])
+def saveFile():
+    
+    data = request.json
+    name = data.get("name")
+    parentId = data.get("parentId")
+    userId = data.get("userId")
+    path = data.get("path")
+    size = data.get("size")
+
+    mydb = get_database()
+    folderCol = mydb["folders"]
+    folders = folderCol.insert_one({
+        "name": name,
+        "user": ObjectId(userId),
+        "parent": ObjectId(parentId),
+        "dateCreate": round(time.time() * 1000),
+        "size": size,
+        "type": 'file',
+        "path": path
+    })
+    return "Upload file successfully!", 200
+
+@driveRoutes.route('/drive/delete-folder', methods = ['POST'])
+def deleteFolder():
+    mydb = get_database()
+    data = request.json
+    folderCol = mydb["folders"]
+
+    folderId = data.get("folderId")
+    folderCol.delete_one({"_id": ObjectId(folderId) })
+    return "Delete successfully!", 200
